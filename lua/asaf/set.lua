@@ -21,3 +21,6 @@ vim.opt.colorcolumn = "100"
 -- Clipboard
 vim.opt.clipboard:append("unnamedplus")
 
+-- Cursor update time 
+vim.opt.updatetime = 100
+

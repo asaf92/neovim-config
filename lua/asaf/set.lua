@@ -9,7 +9,7 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 
--- Highlighting
+-- Search highlighting
 vim.api.nvim_set_keymap('n', '<Esc>', ':nohlsearch<CR>', {noremap = true, silent = true })
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
@@ -17,4 +17,7 @@ vim.opt.incsearch = true
 -- Boundary
 vim.opt.wrap = false
 vim.opt.colorcolumn = "100"
+
+-- Clipboard
+vim.opt.clipboard:append("unnamedplus")
 

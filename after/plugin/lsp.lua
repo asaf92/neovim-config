@@ -4,7 +4,8 @@ lsp.preset("recommended")
 
 lsp.ensure_installed({
   'tsserver',
-  'eslint'
+  'eslint',
+  'pyright'
 })
 
 lsp.nvim_workspace()

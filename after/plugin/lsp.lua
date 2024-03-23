@@ -1,4 +1,5 @@
 local lsp = require("lsp-zero")
+local lspconfig = require('lspconfig')
 
 lsp.preset("recommended")
 
@@ -35,7 +36,18 @@ lsp.setup_nvim_cmp({
 })
 
 lsp.on_attach(function(client, bufnr)
+
   local opts = {buffer = bufnr, remap = false}
+
+  vim.keymap.set("n", "<leader>f", function()
+    -- use eslint for formatting instead of tsserver
+    vim.lsp.buf.format({
+      filter = function(client)
+        return client.name ~= "tsserver"
+      end,
+      bufnr = bufnr,
+    })
+  end, {buffer = bufnr})
  
   vim.keymap.set("n", "gd", function() vim.lsp.buf.definition() end, opts)
   vim.keymap.set("n", "K", function() vim.lsp.buf.hover() end, opts)
@@ -50,6 +62,14 @@ lsp.on_attach(function(client, bufnr)
 end)
 
 lsp.setup()
+
+lspconfig.eslint.setup({
+  format = true,
+  on_attach = function(client, bufnr)
+    client.server_capabilities.documentFormattingProvider = true
+    client.server_capabilities.documentRangeFormattingProvider = true
+  end
+})
 
 vim.diagnostic.config({
 	virtual_text = true

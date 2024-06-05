@@ -6,7 +6,8 @@ lsp.preset("recommended")
 lsp.ensure_installed({
   'tsserver',
   'eslint',
-  'pyright'
+  'pyright',
+  'tailwindcss'
 })
 
 lsp.nvim_workspace()

@@ -7,7 +7,8 @@ lsp.ensure_installed({
   'tsserver',
   'eslint',
   'pyright',
-  'tailwindcss'
+  'tailwindcss',
+  'csharp_ls'
 })
 
 lsp.nvim_workspace()

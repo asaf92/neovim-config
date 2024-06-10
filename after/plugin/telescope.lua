@@ -7,6 +7,11 @@ end)
 
 -- Setup for telescope-ui-select extension
 require('telescope').setup{
+  defaults = {
+    path_display = {
+      "smart",
+    },
+  },
   extensions = {
     ["ui-select"] = {
       require("telescope.themes").get_dropdown { }

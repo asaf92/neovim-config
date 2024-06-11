@@ -32,3 +32,11 @@ vim.opt.clipboard:append("unnamedplus")
 -- Cursor update time 
 vim.opt.updatetime = 100
 
+-- Razor support
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "razor",
+    callback = function()
+        vim.cmd("runtime syntax/razor.vim") -- Ensure the syntax is loaded for Razor files
+    end,
+})
+

@@ -22,6 +22,10 @@ vim.api.nvim_set_keymap('n', '<Esc>', ':nohlsearch<CR>', {noremap = true, silent
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
 
+-- Search casing
+vim.opt.ignorecase = true
+vim.opt.smartcase = true
+
 -- Boundary
 vim.opt.wrap = false
 vim.opt.colorcolumn = "100"

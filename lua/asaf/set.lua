@@ -9,7 +9,7 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = "json",
+  pattern = {"json", "typescriptreact"},
   callback = function()
     vim.opt.tabstop = 2
     vim.opt.softtabstop = 2

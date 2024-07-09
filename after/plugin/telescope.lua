@@ -37,3 +37,9 @@ local function launch_harpoon_marks()
   require("telescope").extensions.harpoon.marks(opts)
 end
 vim.keymap.set('n', '<leader>e', launch_harpoon_marks, {})
+
+-- LSP Actions
+vim.keymap.set('n', '<leader>gd', builtin.lsp_definitions, {})
+vim.keymap.set('n', '<leader>gi', builtin.lsp_implementations, {})
+vim.keymap.set('n', '<leader>rr', builtin.lsp_references, {})
+

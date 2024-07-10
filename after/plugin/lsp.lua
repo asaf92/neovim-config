@@ -8,7 +8,8 @@ lsp.ensure_installed({
   'eslint',
   'pyright',
   'tailwindcss',
-  'csharp_ls'
+  'csharp_ls',
+  'gopls'
 })
 
 lsp.nvim_workspace()

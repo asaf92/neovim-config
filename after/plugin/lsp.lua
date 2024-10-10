@@ -4,7 +4,7 @@ local lspconfig = require('lspconfig')
 lsp.preset("recommended")
 
 lsp.ensure_installed({
-  'tsserver',
+  'ts_ls',
   'eslint',
   'pyright',
   'tailwindcss',
@@ -43,10 +43,10 @@ lsp.on_attach(function(client, bufnr)
   local opts = {buffer = bufnr, remap = false}
 
   vim.keymap.set("n", "<leader>f", function()
-    -- use eslint for formatting instead of tsserver
+    -- use eslint for formatting instead of ts_ls
     vim.lsp.buf.format({
       filter = function(client)
-        return client.name ~= "tsserver"
+        return client.name ~= "ts_ls"
       end,
       bufnr = bufnr,
     })

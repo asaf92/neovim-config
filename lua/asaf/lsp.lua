@@ -57,7 +57,13 @@ function M.setup()
       end
 
       bufmap("n", "gd", vim.lsp.buf.definition)
-      bufmap("n", "K", vim.lsp.buf.hover)
+      bufmap("n", "K", function () 
+        vim.lsp.buf.hover({
+          -- Otherwise there's no border and it's hard to distinguish
+          -- https://www.reddit.com/r/neovim/comments/1jmsl3j/switch_to_011_now_not_showing_borders_on/
+          border = "rounded",
+        })
+      end)
       bufmap("n", "]d", vim.diagnostic.goto_next)
       bufmap("n", "[d", vim.diagnostic.goto_prev)
       bufmap("n", "<leader>d", vim.diagnostic.open_float)

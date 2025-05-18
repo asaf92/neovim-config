@@ -71,7 +71,7 @@ return require('packer').startup(function(use)
         ollama = {
           endpoint = "http://127.0.0.1:11434",
           model = "qwen3:8b",
-        }
+        },
         windows = {
           position = "right",
           width = 30,

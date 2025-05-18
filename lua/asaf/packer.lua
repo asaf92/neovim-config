@@ -67,13 +67,11 @@ return require('packer').startup(function(use)
     },
     config = function()
       require('avante').setup({
-        provider = "claude", -- or "openai" if you prefer
-        claude = {
-          endpoint = "https://api.anthropic.com",
-          model = "claude-3-5-sonnet-20241022",
-          temperature = 0,
-          max_tokens = 4096,
-        },
+        provider = "ollama", -- or "openai" if you prefer
+        ollama = {
+          endpoint = "http://127.0.0.1:11434",
+          model = "qwen3:8b",
+        }
         windows = {
           position = "right",
           width = 30,

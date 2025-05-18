@@ -16,7 +16,7 @@ require('vscode').setup({
     italic_comments = true,
 
     -- Underline `@markup.link.*` variants
-    underline_links = true,
+    underline_links = false,
 
     -- Disable nvim-tree background color
     disable_nvimtree_bg = false,

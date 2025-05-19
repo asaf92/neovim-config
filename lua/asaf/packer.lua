@@ -53,7 +53,12 @@ return require('packer').startup(function(use)
   use 'tpope/vim-surround'
   use {
     'MeanderingProgrammer/render-markdown.nvim',
-    file_types = {'markdown', 'Avante' }
+    config = function()
+      require('render-markdown').setup({
+        file_types = {"markdown", "Avante" },
+        ft = { "markdown", "Avante" },
+      })
+    end
   }
 
   -- Avante.nvim and dependencies
@@ -77,7 +82,7 @@ return require('packer').startup(function(use)
         },
         openai = {
           endpoint = "https://api.openai.com/v1",
-          model = "gpt-4.1",
+          model = "gpt-4.1-mini",
           temperature = 0.5,
           -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
           --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models

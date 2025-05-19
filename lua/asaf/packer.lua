@@ -51,7 +51,11 @@ return require('packer').startup(function(use)
     end
   }
   use 'tpope/vim-surround'
-  
+  use {
+    'MeanderingProgrammer/render-markdown.nvim',
+    file_types = {'markdown', 'Avante' }
+  }
+
   -- Avante.nvim and dependencies
   use {
     'yetone/avante.nvim',
@@ -67,10 +71,21 @@ return require('packer').startup(function(use)
     },
     config = function()
       require('avante').setup({
-        provider = "ollama", -- or "openai" if you prefer
+        provider = "openai",
+        behaviour = {
+            enable_cursor_planning_mode = true,
+        },
+        openai = {
+          endpoint = "https://api.openai.com/v1",
+          model = "gpt-4.1",
+          temperature = 0.5,
+          -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
+          --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+        },
         ollama = {
           endpoint = "http://127.0.0.1:11434",
           model = "qwen3:8b",
+          stream = true,
         },
         windows = {
           position = "right",

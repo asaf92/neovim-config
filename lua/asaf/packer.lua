@@ -56,7 +56,6 @@ return require('packer').startup(function(use)
     config = function()
       require('render-markdown').setup({
         file_types = {"markdown", "Avante" },
-        ft = { "markdown", "Avante" },
       })
     end
   }

@@ -56,24 +56,24 @@ function M.setup()
         vim.keymap.set(mode, lhs, rhs, opts)
       end
 
-      bufmap("n", "gd", vim.lsp.buf.definition)
+      bufmap("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
       bufmap("n", "K", function () 
         vim.lsp.buf.hover({
           -- Otherwise there's no border and it's hard to distinguish
           -- https://www.reddit.com/r/neovim/comments/1jmsl3j/switch_to_011_now_not_showing_borders_on/
           border = "rounded",
         })
-      end)
-      bufmap("n", "]d", vim.diagnostic.goto_next)
-      bufmap("n", "[d", vim.diagnostic.goto_prev)
-      bufmap("n", "<leader>d", vim.diagnostic.open_float)
-      bufmap("n", "<leader>ca", vim.lsp.buf.code_action)
-      bufmap("n", "<leader>rn", vim.lsp.buf.rename)
-      vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr })
+      end, { desc = "Show Hover Information" })
+      bufmap("n", "]d", vim.diagnostic.goto_next, { desc = "Next Diagnostic" })
+      bufmap("n", "[d", vim.diagnostic.goto_prev, { desc = "Previous Diagnostic" })
+      bufmap("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show Diagnostic Float" })
+      bufmap("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
+      bufmap("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
+      vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
 
       bufmap("n", "<leader>f", function()
         vim.lsp.buf.format({ bufnr = bufnr })
-      end)
+      end, { desc = "Format Buffer" })
     end,
   })
 

@@ -75,27 +75,46 @@ return require('packer').startup(function(use)
     },
     config = function()
       require('avante').setup({
-        provider = "openai",
+        provider = "gemini",
         behaviour = {
             enable_cursor_planning_mode = true,
         },
-        openai = {
-          endpoint = "https://api.openai.com/v1",
-          model = "gpt-4.1-mini",
-          temperature = 0.5,
-          -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
-          --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
-        },
-        ollama = {
-          endpoint = "http://127.0.0.1:11434",
-          model = "qwen3:8b",
-          stream = true,
+        providers = {
+          gemini = {
+            model = "gemini-2.5-pro-preview-06-05",
+            extra_request_body = {
+              temperature = 0.5,
+              -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
+              --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+            }
+          },
+          openai = {
+            endpoint = "https://api.openai.com/v1",
+            model = "gpt-4.1-mini",
+            extra_request_body = {
+              temperature = 0.5,
+              -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
+              --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
+            }
+          },
+          ollama = {
+            endpoint = "http://127.0.0.1:11434",
+            model = "qwen3:8b",
+            stream = true,
+          }
         },
         windows = {
           position = "right",
           width = 30,
         }
       })
+    end
+  }
+
+  use {
+    "folke/which-key.nvim",
+    config = function()
+      require("which-key").setup {}
     end
   }
 end)

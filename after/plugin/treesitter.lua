@@ -1,3 +1,12 @@
+vim.filetype.add({
+  extension = {
+    cs = "cs",
+    csharp = "cs",
+  },
+  pattern = {
+    [".*%.csharp"] = "cs",
+  }
+})
 require'nvim-treesitter.configs'.setup {
   -- A list of parser names
   ensure_installed = { 

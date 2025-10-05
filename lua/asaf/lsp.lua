@@ -34,7 +34,6 @@ function M.setup()
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-  local lspconfig = require("lspconfig")
   local servers = { "pyright", "ts_ls", "eslint", "tailwindcss", "csharp_ls", "gopls" }
   for _, server in ipairs(servers) do
     local ok, config = pcall(require, "lsp." .. server)
@@ -42,7 +41,8 @@ function M.setup()
       config = {}
     end
     config.capabilities = vim.tbl_deep_extend("force", config.capabilities or {}, capabilities)
-    lspconfig[server].setup(config)
+    vim.lsp.config(server, config)
+    vim.lsp.enable(server)
   end
 
   -- Keymaps and formatting via LspAttach

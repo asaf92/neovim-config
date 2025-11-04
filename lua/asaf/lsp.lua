@@ -72,14 +72,79 @@ function M.setup()
       vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
 
       bufmap("n", "<leader>f", function()
-        vim.lsp.buf.format({ bufnr = bufnr })
+        local function log(msg, level)
+          vim.notify(string.format("[format] %s", msg), level or vim.log.levels.INFO)
+        end
+
+        local bufname = vim.api.nvim_buf_get_name(bufnr)
+        local filename = bufname ~= "" and bufname or "[No Name]"
+        log(string.format("<leader>f triggered on %s (buf %d)", filename, bufnr))
+
+        local clients = vim.lsp.get_clients({ bufnr = bufnr })
+        if not clients or vim.tbl_isempty(clients) then
+          log("No LSP clients attached; aborting LSP format.", vim.log.levels.WARN)
+          return
+        end
+
+        local eslint_id
+        local ts_id
+        local other_ids = {}
+
+        for _, client in pairs(clients) do
+          if client.supports_method("textDocument/formatting") then
+            log(string.format("Client %s (id %d) supports formatting.", client.name, client.id))
+            if client.name == "eslint" then
+              eslint_id = client.id
+              break
+            elseif client.name == "ts_ls" then
+              ts_id = client.id
+            else
+              table.insert(other_ids, client.id)
+            end
+          else
+            log(string.format("Client %s (id %d) does not support formatting.", client.name, client.id))
+          end
+        end
+
+        local allowed_ids = {}
+        if eslint_id then
+          allowed_ids[eslint_id] = true
+          log(string.format("Formatting with ESLint (client id %d).", eslint_id))
+        elseif #other_ids > 0 then
+          local id_strings = {}
+          for _, id in ipairs(other_ids) do
+            allowed_ids[id] = true
+            table.insert(id_strings, tostring(id))
+          end
+          log(string.format("Formatting with non-ts clients: %s.", table.concat(id_strings, ", ")))
+        elseif ts_id then
+          allowed_ids[ts_id] = true
+          log(string.format("No alternative formatter; falling back to ts_ls (client id %d).", ts_id), vim.log.levels.WARN)
+        else
+          log("No attached LSP clients support formatting for this buffer.", vim.log.levels.WARN)
+          return
+        end
+
+        local ok, err = pcall(vim.lsp.buf.format, {
+          bufnr = bufnr,
+          async = false,
+          filter = function(client)
+            return allowed_ids[client.id] == true
+          end,
+        })
+
+        if not ok then
+          log(string.format("vim.lsp.buf.format failed: %s", err), vim.log.levels.ERROR)
+        else
+          log("LSP format request sent to selected clients.")
+        end
       end, { desc = "Format Buffer" })
     end,
   })
 
   -- LspRestart command
   vim.api.nvim_create_user_command("LspRestart", function()
-    for _, client in pairs(vim.lsp.get_active_clients()) do
+    for _, client in pairs(vim.lsp.get_clients()) do
       client.stop()
     end
   end, { desc = "Restart LSP clients" })

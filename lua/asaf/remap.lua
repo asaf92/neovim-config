@@ -9,3 +9,18 @@ vim.keymap.set("n", "<leader>Y", "ggVGy", {noremap = true, silent = true, desc =
 
 -- LSP Restart
 vim.api.nvim_set_keymap('n', '<leader>lsr', ':LspRestart<CR>', { noremap = true })
+
+-- Pane switching
+local pane_opts = { silent = true }
+
+-- Normal mode pane moves
+vim.keymap.set('n', '<C-h>', '<C-w>h', pane_opts)
+vim.keymap.set('n', '<C-j>', '<C-w>j', pane_opts)
+vim.keymap.set('n', '<C-k>', '<C-w>k', pane_opts)
+vim.keymap.set('n', '<C-l>', '<C-w>l', pane_opts)
+
+-- Terminal mode: first leave terminal-input, then move
+vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]], pane_opts)
+vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-w>j]], pane_opts)
+vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-w>k]], pane_opts)
+vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]], pane_opts)

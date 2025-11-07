@@ -13,11 +13,21 @@ vim.api.nvim_set_keymap('n', '<leader>lsr', ':LspRestart<CR>', { noremap = true 
 -- Pane switching
 local pane_opts = { silent = true }
 
+function MoveOrTmux(direction, tmux_flag)
+  local cur = vim.api.nvim_get_current_win()
+  vim.cmd('wincmd ' .. direction)
+
+  -- If we didn't change window, we're at the edge
+  if vim.api.nvim_get_current_win() == cur and vim.env.TMUX then
+    vim.fn.jobstart({ 'tmux', 'select-pane', '-' .. tmux_flag }, { detach = true })
+  end
+end
+
 -- Normal mode pane moves
-vim.keymap.set('n', '<C-h>', '<C-w>h', pane_opts)
-vim.keymap.set('n', '<C-j>', '<C-w>j', pane_opts)
-vim.keymap.set('n', '<C-k>', '<C-w>k', pane_opts)
-vim.keymap.set('n', '<C-l>', '<C-w>l', pane_opts)
+vim.keymap.set('n', '<C-h>', function() MoveOrTmux('h', 'L') end, pane_opts)
+vim.keymap.set('n', '<C-j>', function() MoveOrTmux('j', 'D') end, pane_opts)
+vim.keymap.set('n', '<C-k>', function() MoveOrTmux('k', 'U') end, pane_opts)
+vim.keymap.set('n', '<C-l>', function() MoveOrTmux('l', 'R') end, pane_opts)
 
 -- Terminal mode: first leave terminal-input, then move
 vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]], pane_opts)

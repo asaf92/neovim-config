@@ -34,7 +34,7 @@ function M.setup()
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-  local servers = { "pyright", "ts_ls", "eslint", "tailwindcss", "csharp_ls", "gopls" }
+  local servers = { "basedpyright", "ruff", "ts_ls", "eslint", "tailwindcss", "csharp_ls", "gopls" }
   for _, server in ipairs(servers) do
     local ok, config = pcall(require, "lsp." .. server)
     if not ok then
@@ -80,9 +80,25 @@ function M.setup()
         local filename = bufname ~= "" and bufname or "[No Name]"
         log(string.format("<leader>f triggered on %s (buf %d)", filename, bufnr))
 
+        local ok_conform, conform = pcall(require, "conform")
+        if ok_conform then
+          local ok_format, err = pcall(conform.format, {
+            bufnr = bufnr,
+            async = false,
+            lsp_fallback = true,
+          })
+
+          if not ok_format then
+            log(string.format("Conform format failed: %s", err), vim.log.levels.ERROR)
+          else
+            log("Formatted buffer via Conform.")
+          end
+          return
+        end
+
         local clients = vim.lsp.get_clients({ bufnr = bufnr })
         if not clients or vim.tbl_isempty(clients) then
-          log("No LSP clients attached; aborting LSP format.", vim.log.levels.WARN)
+          log("No LSP clients attached; aborting format.", vim.log.levels.WARN)
           return
         end
 

@@ -34,7 +34,7 @@ function M.setup()
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-  local servers = { "basedpyright", "ruff", "ts_ls", "eslint", "tailwindcss", "csharp_ls", "gopls" }
+  local servers = { "rust_analyzer", "basedpyright", "ruff", "ts_ls", "eslint", "tailwindcss", "csharp_ls", "gopls" }
   for _, server in ipairs(servers) do
     local ok, config = pcall(require, "lsp." .. server)
     if not ok then
@@ -73,12 +73,10 @@ function M.setup()
 
       bufmap("n", "<leader>f", function()
         local function log(msg, level)
-          vim.notify(string.format("[format] %s", msg), level or vim.log.levels.INFO)
+          if level and level >= vim.log.levels.WARN then
+            vim.notify(string.format("[format] %s", msg), level)
+          end
         end
-
-        local bufname = vim.api.nvim_buf_get_name(bufnr)
-        local filename = bufname ~= "" and bufname or "[No Name]"
-        log(string.format("<leader>f triggered on %s (buf %d)", filename, bufnr))
 
         local ok_conform, conform = pcall(require, "conform")
         if ok_conform then
@@ -90,8 +88,6 @@ function M.setup()
 
           if not ok_format then
             log(string.format("Conform format failed: %s", err), vim.log.levels.ERROR)
-          else
-            log("Formatted buffer via Conform.")
           end
           return
         end
@@ -108,7 +104,6 @@ function M.setup()
 
         for _, client in pairs(clients) do
           if client.supports_method("textDocument/formatting") then
-            log(string.format("Client %s (id %d) supports formatting.", client.name, client.id))
             if client.name == "eslint" then
               eslint_id = client.id
               break
@@ -117,22 +112,18 @@ function M.setup()
             else
               table.insert(other_ids, client.id)
             end
-          else
-            log(string.format("Client %s (id %d) does not support formatting.", client.name, client.id))
           end
         end
 
         local allowed_ids = {}
         if eslint_id then
           allowed_ids[eslint_id] = true
-          log(string.format("Formatting with ESLint (client id %d).", eslint_id))
         elseif #other_ids > 0 then
           local id_strings = {}
           for _, id in ipairs(other_ids) do
             allowed_ids[id] = true
             table.insert(id_strings, tostring(id))
           end
-          log(string.format("Formatting with non-ts clients: %s.", table.concat(id_strings, ", ")))
         elseif ts_id then
           allowed_ids[ts_id] = true
           log(string.format("No alternative formatter; falling back to ts_ls (client id %d).", ts_id), vim.log.levels.WARN)
@@ -151,8 +142,6 @@ function M.setup()
 
         if not ok then
           log(string.format("vim.lsp.buf.format failed: %s", err), vim.log.levels.ERROR)
-        else
-          log("LSP format request sent to selected clients.")
         end
       end, { desc = "Format Buffer" })
     end,

@@ -18,6 +18,13 @@ return require('packer').startup(function(use)
   use('theprimeagen/harpoon')
   use('mbbill/undotree')
   use('tpope/vim-fugitive')
+  use {
+    'ThePrimeagen/refactoring.nvim',
+    requires = {
+      { 'nvim-lua/plenary.nvim' },
+      { 'nvim-treesitter/nvim-treesitter' },
+    },
+  }
   -- LSP and completion plugins
   use 'williamboman/mason.nvim'
   use 'neovim/nvim-lspconfig'

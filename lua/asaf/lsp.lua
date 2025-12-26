@@ -33,7 +33,6 @@ function M.setup()
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-  -- Note: csharp_ls removed - using roslyn.nvim instead (configured in packer.lua)
   local servers = { "pyright", "ts_ls", "eslint", "tailwindcss", "gopls" }
   for _, server in ipairs(servers) do
     local ok, config = pcall(require, "lsp." .. server)

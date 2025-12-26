@@ -39,14 +39,6 @@ vim.opt.updatetime = 100
 -- Global statusline (recommended for Avante.nvim)
 vim.opt.laststatus = 3
 
--- Razor support
-vim.api.nvim_create_autocmd("FileType", {
-    pattern = "razor",
-    callback = function()
-        vim.cmd("runtime syntax/razor.vim") -- Ensure the syntax is loaded for Razor files
-    end,
-})
-
 vim.api.nvim_create_user_command('FormatJson', function(opts)
     local bufnr = 0
     local start_line

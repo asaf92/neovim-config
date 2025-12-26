@@ -55,6 +55,7 @@ function M.setup()
         opts.buffer = bufnr
         vim.keymap.set(mode, lhs, rhs, opts)
       end
+      local filetype = vim.bo[bufnr].filetype
 
       bufmap("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
       bufmap("n", "K", function () 
@@ -71,9 +72,11 @@ function M.setup()
       bufmap("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
       vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
 
-      bufmap("n", "<leader>f", function()
-        vim.lsp.buf.format({ bufnr = bufnr })
-      end, { desc = "Format Buffer" })
+      if filetype ~= "json" and filetype ~= "jsonc" then
+        bufmap("n", "<leader>f", function()
+          vim.lsp.buf.format({ bufnr = bufnr })
+        end, { desc = "Format Buffer" })
+      end
     end,
   })
 

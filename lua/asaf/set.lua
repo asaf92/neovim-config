@@ -47,16 +47,33 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- JQ command (thanks ChatGPT!)
-vim.api.nvim_create_user_command('FormatJson', function()
-    local old_lines = vim.api.nvim_buf_get_lines(0, vim.fn.line("'<")-1, vim.fn.line("'>"), false)
+vim.api.nvim_create_user_command('FormatJson', function(opts)
+    local bufnr = 0
+    local start_line
+    local end_line
+
+    if opts.range == 0 then
+        start_line = 0
+        end_line = vim.api.nvim_buf_line_count(bufnr)
+    else
+        start_line = opts.line1 - 1
+        end_line = opts.line2
+    end
+
+    local old_lines = vim.api.nvim_buf_get_lines(bufnr, start_line, end_line, false)
     local json_text = table.concat(old_lines, "\n")
     local formatted_json = vim.fn.system('jq .', json_text)
 
     if vim.v.shell_error == 0 then
-        vim.api.nvim_buf_set_lines(0, vim.fn.line("'<")-1, vim.fn.line("'>"), false, vim.split(formatted_json, "\n"))
+        vim.api.nvim_buf_set_lines(bufnr, start_line, end_line, false, vim.split(formatted_json, "\n"))
     else
         print("Error formatting JSON")
     end
 end, {range = true})
 vim.api.nvim_set_keymap('v', '<leader>jq',[[:FormatJson<CR>]], {noremap = true, silent = true})
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = {"json", "jsonc"},
+    callback = function()
+        vim.keymap.set('n', '<leader>f', [[:%FormatJson<CR>]], { buffer = true, silent = true, desc = "Format JSON with jq" })
+    end,
+})

@@ -1,8 +1,7 @@
 local M = {}
 
 function M.setup()
-  -- Mason for managing external tools
-  require("mason").setup()
+  -- Note: Mason setup moved to packer.lua to configure custom registries
 
   -- Diagnostics configuration
   vim.diagnostic.config({ virtual_text = true, signs = true, update_in_insert = false })
@@ -34,7 +33,8 @@ function M.setup()
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-  local servers = { "pyright", "ts_ls", "eslint", "tailwindcss", "csharp_ls", "gopls" }
+  -- Note: csharp_ls removed - using roslyn.nvim instead (configured in packer.lua)
+  local servers = { "pyright", "ts_ls", "eslint", "tailwindcss", "gopls" }
   for _, server in ipairs(servers) do
     local ok, config = pcall(require, "lsp." .. server)
     if not ok then

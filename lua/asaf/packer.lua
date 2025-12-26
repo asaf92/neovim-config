@@ -19,8 +19,28 @@ return require('packer').startup(function(use)
   use('mbbill/undotree')
   use('tpope/vim-fugitive')
   -- LSP and completion plugins
-  use 'williamboman/mason.nvim'
+  use {
+    'williamboman/mason.nvim',
+    config = function()
+      require('mason').setup({
+        registries = {
+          'github:mason-org/mason-registry',
+          'github:Crashdummyy/mason-registry',  -- Required for roslyn
+        },
+      })
+    end
+  }
   use 'neovim/nvim-lspconfig'
+  use {
+    'seblyng/roslyn.nvim',
+    ft = { 'cs' },
+    config = function()
+      require('roslyn').setup({
+        filewatching = 'roslyn',  -- Better for large projects
+        broad_search = true,       -- Find solutions in parent directories
+      })
+    end
+  }
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-buffer'

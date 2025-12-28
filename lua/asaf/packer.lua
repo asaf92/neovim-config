@@ -33,7 +33,7 @@ return require('packer').startup(function(use)
   use 'neovim/nvim-lspconfig'
   use {
     'seblyng/roslyn.nvim',
-    ft = { 'cs' },
+    ft = { 'cs', 'razor' },
     config = function()
       require('roslyn').setup({
         filewatching = 'roslyn',  -- Better for large projects

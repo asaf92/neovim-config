@@ -45,6 +45,78 @@ function M.setup()
     vim.lsp.enable(server)
   end
 
+  local function format_buffer(bufnr)
+    local function log(msg, level)
+      if level and level >= vim.log.levels.WARN then
+        vim.notify(string.format("[format] %s", msg), level)
+      end
+    end
+
+    local ok_conform, conform = pcall(require, "conform")
+    if ok_conform then
+      local ok_format, err = pcall(conform.format, {
+        bufnr = bufnr,
+        async = false,
+        lsp_fallback = true,
+      })
+
+      if not ok_format then
+        log(string.format("Conform format failed: %s", err), vim.log.levels.ERROR)
+      end
+      return
+    end
+
+    local clients = vim.lsp.get_clients({ bufnr = bufnr })
+    if not clients or vim.tbl_isempty(clients) then
+      log("No LSP clients attached; aborting format.", vim.log.levels.WARN)
+      return
+    end
+
+    local eslint_id
+    local ts_id
+    local other_ids = {}
+
+    for _, client in pairs(clients) do
+      if client.supports_method("textDocument/formatting") then
+        if client.name == "eslint" then
+          eslint_id = client.id
+          break
+        elseif client.name == "ts_ls" then
+          ts_id = client.id
+        else
+          table.insert(other_ids, client.id)
+        end
+      end
+    end
+
+    local allowed_ids = {}
+    if eslint_id then
+      allowed_ids[eslint_id] = true
+    elseif #other_ids > 0 then
+      for _, id in ipairs(other_ids) do
+        allowed_ids[id] = true
+      end
+    elseif ts_id then
+      allowed_ids[ts_id] = true
+      log(string.format("No alternative formatter; falling back to ts_ls (client id %d).", ts_id), vim.log.levels.WARN)
+    else
+      log("No attached LSP clients support formatting for this buffer.", vim.log.levels.WARN)
+      return
+    end
+
+    local ok, err = pcall(vim.lsp.buf.format, {
+      bufnr = bufnr,
+      async = false,
+      filter = function(client)
+        return allowed_ids[client.id] == true
+      end,
+    })
+
+    if not ok then
+      log(string.format("vim.lsp.buf.format failed: %s", err), vim.log.levels.ERROR)
+    end
+  end
+
   -- Keymaps and formatting via LspAttach
   vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("UserLspConfig", {}),
@@ -72,78 +144,19 @@ function M.setup()
       vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
 
       bufmap("n", "<leader>f", function()
-        local function log(msg, level)
-          if level and level >= vim.log.levels.WARN then
-            vim.notify(string.format("[format] %s", msg), level)
-          end
-        end
-
-        local ok_conform, conform = pcall(require, "conform")
-        if ok_conform then
-          local ok_format, err = pcall(conform.format, {
-            bufnr = bufnr,
-            async = false,
-            lsp_fallback = true,
-          })
-
-          if not ok_format then
-            log(string.format("Conform format failed: %s", err), vim.log.levels.ERROR)
-          end
-          return
-        end
-
-        local clients = vim.lsp.get_clients({ bufnr = bufnr })
-        if not clients or vim.tbl_isempty(clients) then
-          log("No LSP clients attached; aborting format.", vim.log.levels.WARN)
-          return
-        end
-
-        local eslint_id
-        local ts_id
-        local other_ids = {}
-
-        for _, client in pairs(clients) do
-          if client.supports_method("textDocument/formatting") then
-            if client.name == "eslint" then
-              eslint_id = client.id
-              break
-            elseif client.name == "ts_ls" then
-              ts_id = client.id
-            else
-              table.insert(other_ids, client.id)
-            end
-          end
-        end
-
-        local allowed_ids = {}
-        if eslint_id then
-          allowed_ids[eslint_id] = true
-        elseif #other_ids > 0 then
-          local id_strings = {}
-          for _, id in ipairs(other_ids) do
-            allowed_ids[id] = true
-            table.insert(id_strings, tostring(id))
-          end
-        elseif ts_id then
-          allowed_ids[ts_id] = true
-          log(string.format("No alternative formatter; falling back to ts_ls (client id %d).", ts_id), vim.log.levels.WARN)
-        else
-          log("No attached LSP clients support formatting for this buffer.", vim.log.levels.WARN)
-          return
-        end
-
-        local ok, err = pcall(vim.lsp.buf.format, {
-          bufnr = bufnr,
-          async = false,
-          filter = function(client)
-            return allowed_ids[client.id] == true
-          end,
-        })
-
-        if not ok then
-          log(string.format("vim.lsp.buf.format failed: %s", err), vim.log.levels.ERROR)
-        end
+        format_buffer(bufnr)
       end, { desc = "Format Buffer" })
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("BufWritePre", {
+    group = vim.api.nvim_create_augroup("UserFormatOnSave", {}),
+    callback = function(args)
+      if vim.bo[args.buf].buftype ~= "" then
+        return
+      end
+
+      format_buffer(args.buf)
     end,
   })
 

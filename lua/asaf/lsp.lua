@@ -7,6 +7,54 @@ function M.setup()
   -- Diagnostics configuration
   vim.diagnostic.config({ virtual_text = true, signs = true, update_in_insert = false })
 
+  local function inlay_hints_available()
+    return (vim.lsp.inlay_hint and vim.lsp.inlay_hint.enable) or (vim.lsp.buf and vim.lsp.buf.inlay_hint)
+  end
+
+  local function set_inlay_hints(bufnr, enabled)
+    if vim.lsp.inlay_hint and vim.lsp.inlay_hint.enable then
+      vim.lsp.inlay_hint.enable(enabled, { bufnr = bufnr })
+    elseif vim.lsp.buf and vim.lsp.buf.inlay_hint then
+      pcall(vim.lsp.buf.inlay_hint, bufnr, enabled)
+    end
+    vim.b[bufnr].asaf_inlay_hints_enabled = enabled
+  end
+
+  local function user_disabled_inlay_hints(bufnr)
+    return vim.b[bufnr].asaf_inlay_hints_user_disabled == true
+  end
+
+  local function inlay_hints_enabled(bufnr)
+    if vim.lsp.inlay_hint and vim.lsp.inlay_hint.is_enabled then
+      return vim.lsp.inlay_hint.is_enabled({ bufnr = bufnr })
+    end
+    return vim.b[bufnr].asaf_inlay_hints_enabled == true
+  end
+
+  local function enable_inlay_hints_if_allowed(bufnr)
+    if not inlay_hints_available() then
+      return
+    end
+    if user_disabled_inlay_hints(bufnr) then
+      return
+    end
+    if not inlay_hints_enabled(bufnr) then
+      set_inlay_hints(bufnr, true)
+    end
+  end
+
+  local default_inlay_handler = vim.lsp.handlers["textDocument/inlayHint"]
+  vim.lsp.handlers["textDocument/inlayHint"] = function(err, result, ctx, config)
+    local bufnr = ctx and ctx.bufnr or nil
+    if bufnr and vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].filetype == "rust" then
+      enable_inlay_hints_if_allowed(bufnr)
+    end
+
+    if default_inlay_handler then
+      default_inlay_handler(err, result, ctx, config)
+    end
+  end
+
   -- nvim-cmp setup
   local cmp = require("cmp")
   local luasnip = require("luasnip")
@@ -122,6 +170,9 @@ function M.setup()
     group = vim.api.nvim_create_augroup("UserLspConfig", {}),
     callback = function(args)
       local bufnr = args.buf
+      local client_id = args.data and args.data.client_id or nil
+      local client = client_id and vim.lsp.get_client_by_id(client_id) or nil
+      local is_rust = vim.bo[bufnr].filetype == "rust" or (client and client.name == "rust_analyzer")
       local function bufmap(mode, lhs, rhs, opts)
         opts = opts or {}
         opts.buffer = bufnr
@@ -149,6 +200,28 @@ function M.setup()
       bufmap("n", "<leader>f", function()
         format_buffer(bufnr)
       end, { desc = "Format Buffer" })
+
+      if is_rust and client and inlay_hints_available() and client.supports_method and client.supports_method("textDocument/inlayHint") then
+        enable_inlay_hints_if_allowed(bufnr)
+        bufmap("n", "<leader>h", function()
+          local enable = not inlay_hints_enabled(bufnr)
+          vim.b[bufnr].asaf_inlay_hints_user_disabled = not enable
+          set_inlay_hints(bufnr, enable)
+        end, { desc = "Toggle Inlay Hints" })
+      end
+    end,
+  })
+
+  vim.api.nvim_create_autocmd("LspNotify", {
+    group = vim.api.nvim_create_augroup("UserInlayHintsRefresh", {}),
+    callback = function(args)
+      if not args.data or args.data.method ~= "textDocument/didOpen" then
+        return
+      end
+      local bufnr = args.buf
+      if vim.api.nvim_buf_is_valid(bufnr) and vim.bo[bufnr].filetype == "rust" then
+        enable_inlay_hints_if_allowed(bufnr)
+      end
     end,
   })
 

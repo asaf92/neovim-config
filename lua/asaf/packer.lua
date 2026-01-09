@@ -44,10 +44,22 @@ return require('packer').startup(function(use)
   use {
     'github/copilot.vim',
     config = function()
-      -- Disable Copilot's inline suggestions if you only want to use it through Avante
-      -- vim.g.copilot_enabled = false
-      -- Or keep it enabled if you want both inline completions AND Avante access
-      -- vim.g.copilot_enabled = true
+      vim.g.copilot_no_tab_map = true
+      -- Disable all filetypes by default (no automatic suggestions)
+      vim.g.copilot_filetypes = { ['*'] = false }
+  
+      -- Enable for specific filetypes if needed
+      -- vim.g.copilot_filetypes = { ['*'] = false, lua = true, python = true }
+  
+      -- Manual trigger with <leader>p using the built-in suggest plug
+      vim.keymap.set('i', '<C-\\>', '<Plug>(copilot-suggest)', { silent = true })  
+
+      -- Accept with Tab
+      vim.keymap. set('i', '<Tab>', 'copilot#Accept("\\<Tab>")', {
+        expr = true,
+        replace_keycodes = false,
+        silent = true,
+      })
     end
   }
   use 'hrsh7th/nvim-cmp'

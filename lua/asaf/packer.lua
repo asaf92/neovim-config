@@ -41,6 +41,15 @@ return require('packer').startup(function(use)
       })
     end
   }
+  use {
+    'github/copilot.vim',
+    config = function()
+      -- Disable Copilot's inline suggestions if you only want to use it through Avante
+      -- vim.g.copilot_enabled = false
+      -- Or keep it enabled if you want both inline completions AND Avante access
+      -- vim.g.copilot_enabled = true
+    end
+  }
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-buffer'
@@ -95,34 +104,21 @@ return require('packer').startup(function(use)
     },
     config = function()
       require('avante').setup({
-        provider = "gemini",
+        provider = "copilot",
+        mode = "agentic",
+      
         behaviour = {
-            enable_cursor_planning_mode = true,
+          enable_cursor_planning_mode = true,
         },
+      
         providers = {
-          gemini = {
-            model = "gemini-2.5-pro-preview-06-05",
-            extra_request_body = {
-              temperature = 0.5,
-              -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
-              --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
-            }
-          },
-          openai = {
-            endpoint = "https://api.openai.com/v1",
-            model = "gpt-4.1-mini",
-            extra_request_body = {
-              temperature = 0.5,
-              -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
-              --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
-            }
-          },
           ollama = {
             endpoint = "http://127.0.0.1:11434",
             model = "qwen3:8b",
             stream = true,
           }
         },
+      
         windows = {
           position = "right",
           width = 30,

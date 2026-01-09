@@ -136,6 +136,18 @@ return require('packer').startup(function(use)
             insert = "<CR>",  -- Enter in insert mode
           },
         },
+        slash_commands = {
+          {
+            name = "models",
+            description = "Switch or list available models",
+            details = "Opens model selector to switch between AI models",
+            callback = function(sidebar, args, cb)
+              -- Open the model selector
+              vim.cmd("AvanteModels")
+              if cb then cb(args) end
+            end,
+          },
+        },
         windows = {
           position = "right",
           width = 30,

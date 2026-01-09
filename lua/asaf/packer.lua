@@ -131,6 +131,11 @@ return require('packer').startup(function(use)
           }
         },
       
+        mappings = {
+          submit = {
+            insert = "<CR>",  -- Enter in insert mode
+          },
+        },
         windows = {
           position = "right",
           width = 30,

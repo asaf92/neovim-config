@@ -124,13 +124,15 @@ return require('packer').startup(function(use)
         },
       
         providers = {
+          copilot = {
+            model = "claude-opus-4.5",
+          },
           ollama = {
             endpoint = "http://127.0.0.1:11434",
             model = "qwen3:8b",
             stream = true,
           }
         },
-      
         mappings = {
           submit = {
             insert = "<CR>",  -- Enter in insert mode

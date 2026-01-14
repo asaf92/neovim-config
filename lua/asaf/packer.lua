@@ -83,27 +83,32 @@ return require('packer').startup(function(use)
       'MeanderingProgrammer/render-markdown.nvim',
     },
     config = function()
+      local vertex_project = os.getenv("VERTEXAI_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT")
+      local vertex_location = os.getenv("VERTEXAI_LOCATION") or os.getenv("GOOGLE_CLOUD_LOCATION") or "global"
+
+      if vertex_project and vertex_project ~= "" then
+        vim.env.GOOGLE_CLOUD_PROJECT = vertex_project
+      end
+      if vertex_location and vertex_location ~= "" then
+        vim.env.GOOGLE_CLOUD_LOCATION = vertex_location
+      end
+
       require('avante').setup({
-        provider = "gemini",
+        provider = "vertex",
         behaviour = {
             enable_cursor_planning_mode = true,
         },
         providers = {
-          gemini = {
-            model = "gemini-2.5-pro-preview-06-05",
+          vertex = {
+            endpoint = string.format(
+              "https://aiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models",
+              vertex_project or "PROJECT_ID",
+              vertex_location or "global"
+            ),
+            model = "gemini-3-pro-preview",
+            model_names = { "gemini-3-pro-preview" },
             extra_request_body = {
               temperature = 0.5,
-              -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
-              --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
-            }
-          },
-          openai = {
-            endpoint = "https://api.openai.com/v1",
-            model = "gpt-4.1-mini",
-            extra_request_body = {
-              temperature = 0.5,
-              -- max_completion_tokens = 8192, -- Increase this to include reasoning tokens (for reasoning models)
-              --reasoning_effort = "medium", -- low|medium|high, only used for reasoning models
             }
           },
           ollama = {

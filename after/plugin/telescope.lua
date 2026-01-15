@@ -9,6 +9,12 @@ vim.keymap.set('n', '<leader>pq', builtin.quickfix, { desc = "Quickfix List" })
 -- Setup for telescope-ui-select extension
 require('telescope').setup{
   defaults = {
+    layout_strategy = "vertical",
+    layout_config = {
+      vertical = {
+        mirror = true,
+      },
+    },
     path_display = {
       "smart",
     },

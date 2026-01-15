@@ -43,6 +43,22 @@ function M.setup()
     end
   end
 
+  local function mark_lsp_ready(bufnr, source)
+    if not bufnr or not vim.api.nvim_buf_is_valid(bufnr) then
+      return
+    end
+    if vim.b[bufnr].asaf_lsp_ready then
+      return
+    end
+    vim.b[bufnr].asaf_lsp_ready = true
+    vim.b[bufnr].asaf_lsp_ready_source = source
+    if vim.g.asaf_lsp_status_debug then
+      local name = vim.api.nvim_buf_get_name(bufnr)
+      local display = name ~= "" and name or string.format("buffer %d", bufnr)
+      vim.notify(string.format("LSP ready (%s) for %s", source, display), vim.log.levels.INFO)
+    end
+  end
+
   local default_inlay_handler = vim.lsp.handlers["textDocument/inlayHint"]
   vim.lsp.handlers["textDocument/inlayHint"] = function(err, result, ctx, config)
     local bufnr = ctx and ctx.bufnr or nil
@@ -50,8 +66,25 @@ function M.setup()
       enable_inlay_hints_if_allowed(bufnr)
     end
 
+    if bufnr and result and not vim.tbl_isempty(result) then
+      mark_lsp_ready(bufnr, "inlay_hint")
+    end
+
     if default_inlay_handler then
       default_inlay_handler(err, result, ctx, config)
+    end
+  end
+
+  local default_diagnostics_handler = vim.lsp.handlers["textDocument/publishDiagnostics"]
+  vim.lsp.handlers["textDocument/publishDiagnostics"] = function(err, result, ctx, config)
+    local bufnr = ctx and ctx.bufnr or nil
+    local has_diagnostics = result and result.diagnostics and not vim.tbl_isempty(result.diagnostics)
+    if bufnr and has_diagnostics then
+      mark_lsp_ready(bufnr, "diagnostics")
+    end
+
+    if default_diagnostics_handler then
+      default_diagnostics_handler(err, result, ctx, config)
     end
   end
 
@@ -173,6 +206,9 @@ function M.setup()
       local client_id = args.data and args.data.client_id or nil
       local client = client_id and vim.lsp.get_client_by_id(client_id) or nil
       local is_rust = vim.bo[bufnr].filetype == "rust" or (client and client.name == "rust_analyzer")
+      if vim.b[bufnr].asaf_lsp_ready == nil then
+        vim.b[bufnr].asaf_lsp_ready = false
+      end
       local function bufmap(mode, lhs, rhs, opts)
         opts = opts or {}
         opts.buffer = bufnr
@@ -225,6 +261,20 @@ function M.setup()
     end,
   })
 
+  vim.api.nvim_create_autocmd("LspDetach", {
+    group = vim.api.nvim_create_augroup("UserLspReadyReset", {}),
+    callback = function(args)
+      local bufnr = args.buf
+      if not vim.api.nvim_buf_is_valid(bufnr) then
+        return
+      end
+      if vim.tbl_isempty(vim.lsp.get_clients({ bufnr = bufnr })) then
+        vim.b[bufnr].asaf_lsp_ready = nil
+        vim.b[bufnr].asaf_lsp_ready_source = nil
+      end
+    end,
+  })
+
   vim.api.nvim_create_autocmd("BufWritePre", {
     group = vim.api.nvim_create_augroup("UserFormatOnSave", {}),
     callback = function(args)
@@ -235,6 +285,36 @@ function M.setup()
       format_buffer(args.buf)
     end,
   })
+
+  local function lsp_status_icon(bufnr)
+    local clients = vim.lsp.get_clients({ bufnr = bufnr })
+    if not clients or vim.tbl_isempty(clients) then
+      return "–"
+    end
+
+    for _, client in ipairs(clients) do
+      if client.is_stopped and client.is_stopped() then
+        return "✗"
+      end
+    end
+
+    if vim.b[bufnr].asaf_lsp_ready == true then
+      return "✓"
+    end
+
+    return "…"
+  end
+
+  function _G.asaf_lsp_status()
+    return string.format("LSP:%s", lsp_status_icon(0))
+  end
+
+  local statusline_suffix = "%{v:lua.asaf_lsp_status()}"
+  if vim.o.statusline == "" then
+    vim.o.statusline = "%f %h%m%r%=%-14.(%l,%c%V%) %P " .. statusline_suffix
+  else
+    vim.o.statusline = vim.o.statusline .. " " .. statusline_suffix
+  end
 
   -- LspRestart command
   vim.api.nvim_create_user_command("LspRestart", function()

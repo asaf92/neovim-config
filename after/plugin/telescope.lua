@@ -42,4 +42,5 @@ vim.keymap.set('n', '<leader>e', launch_harpoon_marks, { desc = "Harpoon Marks" 
 vim.keymap.set('n', '<leader>gd', builtin.lsp_definitions, { desc = "LSP Definitions" })
 vim.keymap.set('n', '<leader>gi', builtin.lsp_implementations, { desc = "LSP Implementations" })
 vim.keymap.set('n', '<leader>rr', builtin.lsp_references, { desc = "LSP References" })
+vim.keymap.set('n', '<leader>t', builtin.lsp_dynamic_workspace_symbols, { desc = "LSP Workspace Symbols" })
 

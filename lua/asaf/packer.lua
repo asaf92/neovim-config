@@ -72,6 +72,7 @@ return require('packer').startup(function(use)
   -- Avante.nvim and dependencies
   use {
     'yetone/avante.nvim',
+    disable = true -- It's annoying + clashes with my <leader>a
     branch = 'main',
     run = 'make',
     requires = {
@@ -105,8 +106,8 @@ return require('packer').startup(function(use)
               vertex_project or "PROJECT_ID",
               vertex_location or "global"
             ),
-            model = "gemini-3-pro-preview",
-            model_names = { "gemini-3-pro-preview" },
+            model = "gemini-2.5-flash",
+            model_names = { "gemini-2.5-flash" },
             extra_request_body = {
               temperature = 0.5,
             }

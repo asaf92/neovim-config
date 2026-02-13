@@ -73,6 +73,24 @@ function M.setup()
 
       if filetype ~= "json" and filetype ~= "jsonc" then
         bufmap("n", "<leader>f", function()
+          local eslint_filetypes = {
+            javascript = true,
+            javascriptreact = true,
+            typescript = true,
+            typescriptreact = true,
+          }
+          if eslint_filetypes[filetype] then
+            local has_eslint = #vim.lsp.get_clients({ bufnr = bufnr, name = "eslint" }) > 0
+            if has_eslint then
+              vim.lsp.buf.format({
+                bufnr = bufnr,
+                filter = function(client)
+                  return client.name == "eslint"
+                end,
+              })
+              return
+            end
+          end
           vim.lsp.buf.format({ bufnr = bufnr })
         end, { desc = "Format Buffer" })
       end

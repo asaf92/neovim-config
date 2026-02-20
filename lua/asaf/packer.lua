@@ -15,6 +15,11 @@ return require('packer').startup(function(use)
   use 'Mofiqul/vscode.nvim' 
 
   use('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
+  use 'windwp/nvim-autopairs'
+  use {
+    'windwp/nvim-ts-autotag',
+    after = 'nvim-treesitter',
+  }
   use('theprimeagen/harpoon')
   use('mbbill/undotree')
   use('tpope/vim-fugitive')

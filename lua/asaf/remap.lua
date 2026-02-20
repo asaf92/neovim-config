@@ -34,3 +34,15 @@ vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]], pane_opts)
 vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-w>j]], pane_opts)
 vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-w>k]], pane_opts)
 vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]], pane_opts)
+
+-- Netrw buffer-local mappings override global <C-l>, so rebind pane keys there too.
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = 'netrw',
+  callback = function(args)
+    local opts = { buffer = args.buf, silent = true }
+    vim.keymap.set('n', '<C-h>', function() MoveOrTmux('h', 'L') end, opts)
+    vim.keymap.set('n', '<C-j>', function() MoveOrTmux('j', 'D') end, opts)
+    vim.keymap.set('n', '<C-k>', function() MoveOrTmux('k', 'U') end, opts)
+    vim.keymap.set('n', '<C-l>', function() MoveOrTmux('l', 'R') end, opts)
+  end,
+})

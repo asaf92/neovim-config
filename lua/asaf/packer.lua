@@ -69,63 +69,6 @@ return require('packer').startup(function(use)
     end
   }
 
-  -- Avante.nvim and dependencies
-  use {
-    'yetone/avante.nvim',
-    disable = true -- It's annoying + clashes with my <leader>a
-    branch = 'main',
-    run = 'make',
-    requires = {
-      'nvim-treesitter/nvim-treesitter',
-      'stevearc/dressing.nvim',
-      'nvim-lua/plenary.nvim',
-      'MunifTanjim/nui.nvim',
-      'nvim-tree/nvim-web-devicons',
-      'MeanderingProgrammer/render-markdown.nvim',
-    },
-    config = function()
-      local vertex_project = os.getenv("VERTEXAI_PROJECT") or os.getenv("GOOGLE_CLOUD_PROJECT")
-      local vertex_location = os.getenv("VERTEXAI_LOCATION") or os.getenv("GOOGLE_CLOUD_LOCATION") or "global"
-
-      if vertex_project and vertex_project ~= "" then
-        vim.env.GOOGLE_CLOUD_PROJECT = vertex_project
-      end
-      if vertex_location and vertex_location ~= "" then
-        vim.env.GOOGLE_CLOUD_LOCATION = vertex_location
-      end
-
-      require('avante').setup({
-        provider = "vertex",
-        behaviour = {
-            enable_cursor_planning_mode = true,
-        },
-        providers = {
-          vertex = {
-            endpoint = string.format(
-              "https://aiplatform.googleapis.com/v1/projects/%s/locations/%s/publishers/google/models",
-              vertex_project or "PROJECT_ID",
-              vertex_location or "global"
-            ),
-            model = "gemini-2.5-flash",
-            model_names = { "gemini-2.5-flash" },
-            extra_request_body = {
-              temperature = 0.5,
-            }
-          },
-          ollama = {
-            endpoint = "http://127.0.0.1:11434",
-            model = "qwen3:8b",
-            stream = true,
-          }
-        },
-        windows = {
-          position = "right",
-          width = 30,
-        }
-      })
-    end
-  }
-
   use {
     "folke/which-key.nvim",
     config = function()

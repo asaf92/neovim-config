@@ -10,6 +10,7 @@ return require('packer').startup(function(use)
 	  'nvim-telescope/telescope.nvim', tag = '0.1.5',
 	  requires = { {'nvim-lua/plenary.nvim'} }
   }
+  use 'nvim-tree/nvim-web-devicons'
   use {'nvim-telescope/telescope-ui-select.nvim' }
 
   use 'Mofiqul/vscode.nvim' 

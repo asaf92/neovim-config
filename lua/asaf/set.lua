@@ -36,7 +36,7 @@ vim.opt.clipboard:append("unnamedplus")
 -- Cursor update time 
 vim.opt.updatetime = 100
 
--- Global statusline (recommended for Avante.nvim)
+-- Global statusline
 vim.opt.laststatus = 3
 
 vim.api.nvim_create_user_command('FormatJson', function(opts)

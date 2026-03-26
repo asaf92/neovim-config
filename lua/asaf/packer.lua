@@ -101,67 +101,11 @@ return require('packer').startup(function(use)
     'MeanderingProgrammer/render-markdown.nvim',
     config = function()
       require('render-markdown').setup({
-        file_types = {"markdown", "Avante" },
+        file_types = {"markdown"},
       })
     end
   }
-
-  -- Avante.nvim and dependencies
-  use {
-    'yetone/avante.nvim',
-    branch = 'main',
-    run = 'make',
-    requires = {
-      'nvim-treesitter/nvim-treesitter',
-      'stevearc/dressing.nvim',
-      'nvim-lua/plenary.nvim',
-      'MunifTanjim/nui.nvim',
-      'nvim-tree/nvim-web-devicons',
-      'MeanderingProgrammer/render-markdown.nvim',
-    },
-    config = function()
-      require('avante').setup({
-        provider = "copilot",
-        mode = "agentic",
-      
-        behaviour = {
-          enable_cursor_planning_mode = true,
-        },
-      
-        providers = {
-          copilot = {
-            model = "claude-opus-4.5",
-          },
-          ollama = {
-            endpoint = "http://127.0.0.1:11434",
-            model = "qwen3:8b",
-            stream = true,
-          }
-        },
-        mappings = {
-          submit = {
-            insert = "<CR>",  -- Enter in insert mode
-          },
-        },
-        slash_commands = {
-          {
-            name = "models",
-            description = "Switch or list available models",
-            details = "Opens model selector to switch between AI models",
-            callback = function(sidebar, args, cb)
-              -- Open the model selector
-              vim.cmd("AvanteModels")
-              if cb then cb(args) end
-            end,
-          },
-        },
-        windows = {
-          position = "right",
-          width = 30,
-        }
-      })
-    end
-  }
+  use 'nvim-tree/nvim-web-devicons'
 
   use {
     "folke/which-key.nvim",

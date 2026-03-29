@@ -229,7 +229,7 @@ function M.setup()
         vim.diagnostic.setqflist({ open = true })
       end, { desc = "Diagnostics -> Quickfix" })
       bufmap("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show Diagnostic Float" })
-      bufmap("n", "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
+      bufmap({"n", "v"}, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
       bufmap("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
       vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
 

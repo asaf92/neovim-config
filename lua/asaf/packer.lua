@@ -10,11 +10,13 @@ return require('packer').startup(function(use)
 	  'nvim-telescope/telescope.nvim', tag = '0.1.5',
 	  requires = { {'nvim-lua/plenary.nvim'} }
   }
+  use 'nvim-tree/nvim-web-devicons'
   use {'nvim-telescope/telescope-ui-select.nvim' }
 
-  use 'Mofiqul/vscode.nvim' 
+  use 'Mofiqul/vscode.nvim'
 
   use('nvim-treesitter/nvim-treesitter', {run = ':TSUpdate'})
+  use 'nvim-treesitter/nvim-treesitter-context'
   use 'windwp/nvim-autopairs'
   use {
     'windwp/nvim-ts-autotag',
@@ -23,50 +25,16 @@ return require('packer').startup(function(use)
   use('theprimeagen/harpoon')
   use('mbbill/undotree')
   use('tpope/vim-fugitive')
+  use {
+    'ThePrimeagen/refactoring.nvim',
+    requires = {
+      { 'nvim-lua/plenary.nvim' },
+      { 'nvim-treesitter/nvim-treesitter' },
+    },
+  }
   -- LSP and completion plugins
-  use {
-    'williamboman/mason.nvim',
-    config = function()
-      require('mason').setup({
-        registries = {
-          'github:mason-org/mason-registry',
-          'github:Crashdummyy/mason-registry',  -- Required for roslyn
-        },
-      })
-    end
-  }
+  use 'williamboman/mason.nvim'
   use 'neovim/nvim-lspconfig'
-  use {
-    'seblyng/roslyn.nvim',
-    ft = { 'cs', 'razor' },
-    config = function()
-      require('roslyn').setup({
-        filewatching = 'roslyn',  -- Better for large projects
-        broad_search = true,       -- Find solutions in parent directories
-      })
-    end
-  }
-  use {
-    'github/copilot.vim',
-    config = function()
-      vim.g.copilot_no_tab_map = true
-      -- Disable all filetypes by default (no automatic suggestions)
-      vim.g.copilot_filetypes = { ['*'] = false }
-  
-      -- Enable for specific filetypes if needed
-      -- vim.g.copilot_filetypes = { ['*'] = false, lua = true, python = true }
-  
-      -- Manual trigger with <leader>p using the built-in suggest plug
-      vim.keymap.set('i', '<C-\\>', '<Plug>(copilot-suggest)', { silent = true })  
-
-      -- Accept with Tab
-      vim.keymap. set('i', '<Tab>', 'copilot#Accept("\\<Tab>")', {
-        expr = true,
-        replace_keycodes = false,
-        silent = true,
-      })
-    end
-  }
   use 'hrsh7th/nvim-cmp'
   use 'hrsh7th/cmp-nvim-lsp'
   use 'hrsh7th/cmp-buffer'
@@ -75,6 +43,24 @@ return require('packer').startup(function(use)
   use 'saadparwaiz1/cmp_luasnip'
   use 'L3MON4D3/LuaSnip'
   use 'rafamadriz/friendly-snippets'
+  use 'stevearc/conform.nvim'
+  use {
+    'ggml-org/llama.vim',
+    setup = function()
+      vim.g.llama_config = {
+        auto_fim = false,
+        endpoint_fim = 'http://127.0.0.1:8012/infill',
+        keymap_fim_trigger = '<C-f>',
+        keymap_fim_accept_full = '<Tab>',
+        keymap_fim_accept_line = '<S-Tab>',
+        keymap_inst_trigger = '',
+        keymap_inst_rerun = '',
+        keymap_inst_continue = '',
+        keymap_inst_accept = '',
+        keymap_inst_cancel = '',
+      }
+    end,
+  }
   use {
     'chentoast/marks.nvim',
     config = function()
@@ -105,7 +91,6 @@ return require('packer').startup(function(use)
       })
     end
   }
-  use 'nvim-tree/nvim-web-devicons'
 
   use {
     "folke/which-key.nvim",
@@ -113,5 +98,4 @@ return require('packer').startup(function(use)
       require("which-key").setup {}
     end
   }
-  use 'rebelot/kanagawa.nvim'
 end)

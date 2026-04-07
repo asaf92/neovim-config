@@ -9,12 +9,13 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = {"json", "jsonc", "javascript", "javascriptreact", "typescript", "typescriptreact"},
+  pattern = { "javascript", "javascriptreact", "typescript", "typescriptreact", "json", "jsonc" },
   callback = function()
-    vim.opt_local.tabstop = 2
-    vim.opt_local.softtabstop = 2
-    vim.opt_local.shiftwidth = 2
-  end
+    local opt = vim.opt_local
+    opt.tabstop = 2
+    opt.softtabstop = 2
+    opt.shiftwidth = 2
+  end,
 })
 
 -- Search highlighting

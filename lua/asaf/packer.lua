@@ -40,6 +40,10 @@ return require('packer').startup(function(use)
   use 'rafamadriz/friendly-snippets'
   use 'stevearc/conform.nvim'
   use {
+    "pmizio/typescript-tools.nvim",
+    requires = { "nvim-lua/plenary.nvim" },
+  }
+  use {
     'ggml-org/llama.vim',
     setup = function()
       vim.g.llama_config = {

@@ -34,3 +34,8 @@ vim.keymap.set('t', '<C-h>', [[<C-\><C-n><C-w>h]], pane_opts)
 vim.keymap.set('t', '<C-j>', [[<C-\><C-n><C-w>j]], pane_opts)
 vim.keymap.set('t', '<C-k>', [[<C-\><C-n><C-w>k]], pane_opts)
 vim.keymap.set('t', '<C-l>', [[<C-\><C-n><C-w>l]], pane_opts)
+
+
+-- Quickfix navigation
+vim.keymap.set('n', ']q', '<cmd>cnext<CR>', { desc = "Next Quickfix" })
+vim.keymap.set('n', '[q', '<cmd>cprev<CR>', { desc = "Previous Quickfix" })

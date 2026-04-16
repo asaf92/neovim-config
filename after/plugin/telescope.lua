@@ -6,9 +6,37 @@ vim.keymap.set('n', '<leader>ps', function()
 end, { desc = "Grep String" })
 vim.keymap.set('n', '<leader>pq', builtin.quickfix, { desc = "Quickfix List" })
 
+local function location_tiebreak(current_entry, existing_entry)
+  local current_file = current_entry.filename or current_entry.path
+  local existing_file = existing_entry.filename or existing_entry.path
+
+  if type(current_file) == "string" and type(existing_file) == "string" then
+    if current_file ~= existing_file then
+      return current_file < existing_file
+    end
+
+    local current_lnum = tonumber(current_entry.lnum) or 0
+    local existing_lnum = tonumber(existing_entry.lnum) or 0
+    if current_lnum ~= existing_lnum then
+      return current_lnum < existing_lnum
+    end
+
+    local current_col = tonumber(current_entry.col) or 0
+    local existing_col = tonumber(existing_entry.col) or 0
+    if current_col ~= existing_col then
+      return current_col < existing_col
+    end
+  end
+
+  local current_ordinal = current_entry.ordinal or ""
+  local existing_ordinal = existing_entry.ordinal or ""
+  return #current_ordinal < #existing_ordinal
+end
+
 -- Setup for telescope-ui-select extension
 require('telescope').setup{
   defaults = {
+    tiebreak = location_tiebreak,
     vimgrep_arguments = {
       'rg',
       '--color=never',

@@ -21,8 +21,12 @@ require('telescope').setup{
       '--glob',
       '!**/.git/*',
     },
-    layout_strategy = "vertical",
+    layout_strategy = "flex",
     layout_config = {
+      flex = {
+        flip_columns = 140,
+        flip_lines = 15,
+      },
       vertical = {
         mirror = true,
       },

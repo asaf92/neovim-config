@@ -9,7 +9,7 @@ vim.opt.shiftwidth = 4
 vim.opt.expandtab = true
 vim.opt.smartindent = true
 vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "javascript", "javascriptreact", "typescript", "typescriptreact", "json", "jsonc" },
+  pattern = { "javascript", "javascriptreact", "typescript", "typescriptreact", "json", "jsonc", "lua" },
   callback = function()
     local opt = vim.opt_local
     opt.tabstop = 2
@@ -19,7 +19,7 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- Search highlighting
-vim.api.nvim_set_keymap('n', '<Esc>', ':nohlsearch<CR>', {noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<Esc>', ':nohlsearch<CR>', { noremap = true, silent = true })
 vim.opt.hlsearch = true
 vim.opt.incsearch = true
 
@@ -34,7 +34,7 @@ vim.opt.colorcolumn = "100"
 -- Clipboard
 vim.opt.clipboard:append("unnamedplus")
 
--- Cursor update time 
+-- Cursor update time
 vim.opt.updatetime = 100
 
 -- Global statusline (recommended for Avante.nvim)
@@ -42,22 +42,22 @@ vim.opt.laststatus = 3
 
 -- Razor support
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "razor",
-    callback = function()
-        vim.cmd("runtime syntax/razor.vim") -- Ensure the syntax is loaded for Razor files
-    end,
+  pattern = "razor",
+  callback = function()
+    vim.cmd("runtime syntax/razor.vim") -- Ensure the syntax is loaded for Razor files
+  end,
 })
 
 -- JQ command (thanks ChatGPT!)
 vim.api.nvim_create_user_command('FormatJson', function()
-    local old_lines = vim.api.nvim_buf_get_lines(0, vim.fn.line("'<")-1, vim.fn.line("'>"), false)
-    local json_text = table.concat(old_lines, "\n")
-    local formatted_json = vim.fn.system('jq .', json_text)
+  local old_lines = vim.api.nvim_buf_get_lines(0, vim.fn.line("'<") - 1, vim.fn.line("'>"), false)
+  local json_text = table.concat(old_lines, "\n")
+  local formatted_json = vim.fn.system('jq .', json_text)
 
-    if vim.v.shell_error == 0 then
-        vim.api.nvim_buf_set_lines(0, vim.fn.line("'<")-1, vim.fn.line("'>"), false, vim.split(formatted_json, "\n"))
-    else
-        print("Error formatting JSON")
-    end
-end, {range = true})
-vim.api.nvim_set_keymap('v', '<leader>jq',[[:FormatJson<CR>]], {noremap = true, silent = true})
+  if vim.v.shell_error == 0 then
+    vim.api.nvim_buf_set_lines(0, vim.fn.line("'<") - 1, vim.fn.line("'>"), false, vim.split(formatted_json, "\n"))
+  else
+    print("Error formatting JSON")
+  end
+end, { range = true })
+vim.api.nvim_set_keymap('v', '<leader>jq', [[:FormatJson<CR>]], { noremap = true, silent = true })

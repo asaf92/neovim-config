@@ -6,11 +6,11 @@ function M.setup()
 
   -- Diagnostics configuration
   vim.diagnostic.config({
-      virtual_text = false,
-      virtual_lines = true,
-      signs = true, 
-      update_in_insert = false, 
-      severity_sort = true,
+    virtual_text = false,
+    virtual_lines = true,
+    signs = true,
+    update_in_insert = false,
+    severity_sort = true,
   })
 
   local function inlay_hints_available()
@@ -121,7 +121,8 @@ function M.setup()
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-  local servers = { "rust_analyzer", "basedpyright", "ruff", "eslint", "oxlint", "tailwindcss", "csharp_ls", "gopls" }
+  local servers = { "rust_analyzer", "basedpyright", "ruff", "eslint", "oxlint", "tailwindcss", "csharp_ls", "gopls",
+    "lua_ls" }
   for _, server in ipairs(servers) do
     local ok, config = pcall(require, "lsp." .. server)
     if not ok then
@@ -185,7 +186,8 @@ function M.setup()
       end
     elseif ts_id then
       allowed_ids[ts_id] = true
-      log(string.format("No alternative formatter; falling back to ts_ls (client id %d).", ts_id), vim.log.levels.WARN)
+      log(string.format("No alternative formatter; falling back to ts_ls (client id %d).", ts_id),
+        vim.log.levels.WARN)
     else
       log("No attached LSP clients support formatting for this buffer.", vim.log.levels.WARN)
       return
@@ -222,7 +224,7 @@ function M.setup()
       end
 
       bufmap("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
-      bufmap("n", "K", function () 
+      bufmap("n", "K", function()
         vim.lsp.buf.hover({
           -- Otherwise there's no border and it's hard to distinguish
           -- https://www.reddit.com/r/neovim/comments/1jmsl3j/switch_to_011_now_not_showing_borders_on/
@@ -235,7 +237,7 @@ function M.setup()
         vim.diagnostic.setqflist({ open = true })
       end, { desc = "Diagnostics -> Quickfix" })
       bufmap("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show Diagnostic Float" })
-      bufmap({"n", "v"}, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
+      bufmap({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
       bufmap("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
       vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
 

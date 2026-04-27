@@ -5,11 +5,12 @@ function M.setup()
   require("mason").setup()
 
   -- Diagnostics configuration
-  vim.diagnostic.config({ 
-      virtual_text = true,
+  vim.diagnostic.config({
+      virtual_text = false,
+      virtual_lines = true,
       signs = true, 
       update_in_insert = false, 
-      severity_sort = true 
+      severity_sort = true,
   })
 
   local function inlay_hints_available()

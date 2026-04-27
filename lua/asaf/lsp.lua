@@ -115,7 +115,7 @@ function M.setup()
   local capabilities = vim.lsp.protocol.make_client_capabilities()
   capabilities = require("cmp_nvim_lsp").default_capabilities(capabilities)
 
-  local servers = { "rust_analyzer", "basedpyright", "ruff", "eslint", "tailwindcss", "csharp_ls", "gopls" }
+  local servers = { "rust_analyzer", "basedpyright", "ruff", "eslint", "oxlint", "tailwindcss", "csharp_ls", "gopls" }
   for _, server in ipairs(servers) do
     local ok, config = pcall(require, "lsp." .. server)
     if not ok then

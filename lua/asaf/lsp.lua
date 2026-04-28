@@ -13,6 +13,22 @@ function M.setup()
     severity_sort = true,
   })
 
+  local diagnostic_modes = {
+    { virtual_lines = true,  virtual_text = false, label = "virtual_lines" },
+    { virtual_lines = false, virtual_text = true,  label = "virtual_text" },
+    { virtual_lines = false, virtual_text = false, label = "disabled" },
+  }
+  local diagnostic_mode_idx = 1
+
+  local function cycle_diagnostic_mode()
+    diagnostic_mode_idx = diagnostic_mode_idx % #diagnostic_modes + 1
+    local mode = diagnostic_modes[diagnostic_mode_idx]
+    vim.diagnostic.config({
+      virtual_lines = mode.virtual_lines,
+      virtual_text = mode.virtual_text,
+    })
+  end
+
   local function inlay_hints_available()
     return (vim.lsp.inlay_hint and vim.lsp.inlay_hint.enable) or (vim.lsp.buf and vim.lsp.buf.inlay_hint)
   end
@@ -237,6 +253,7 @@ function M.setup()
         vim.diagnostic.setqflist({ open = true })
       end, { desc = "Diagnostics -> Quickfix" })
       bufmap("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show Diagnostic Float" })
+      bufmap("n", "<leader>D", cycle_diagnostic_mode, { desc = "Cycle diagnostic display" })
       bufmap({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
       bufmap("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
       vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })

@@ -10,7 +10,7 @@ function M.setup()
     virtual_lines = true,
     signs = true,
     update_in_insert = false,
-    severity_sort = true,
+    severity_sort = false,
   })
 
   local diagnostic_modes = {

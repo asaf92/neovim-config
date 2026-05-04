@@ -23,8 +23,7 @@ return require('packer').startup(function(use)
   use {
     'ThePrimeagen/refactoring.nvim',
     requires = {
-      { 'nvim-lua/plenary.nvim' },
-      { 'nvim-treesitter/nvim-treesitter' },
+      { 'lewis6991/async.nvim' },
     },
   }
   -- LSP and completion plugins
@@ -57,6 +56,7 @@ return require('packer').startup(function(use)
         keymap_inst_continue = '',
         keymap_inst_accept = '',
         keymap_inst_cancel = '',
+        enable_at_startup = false,
       }
     end,
   }

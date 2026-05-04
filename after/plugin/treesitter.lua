@@ -7,39 +7,45 @@ vim.filetype.add({
     [".*%.csharp"] = "cs",
   }
 })
-require'nvim-treesitter.configs'.setup {
-  -- A list of parser names
-  ensure_installed = { 
-    "javascript",
-    "typescript",
-    "tsx",
-    "c_sharp",
-    "markdown",
-    "markdown_inline",
-    "c",
-    "lua",
-    "vim",
-    "vimdoc",
-    "query",
-    "regex",
-    "html"
-  },
 
+local treesitter = require('nvim-treesitter')
 
-  -- Install parsers synchronously (only applied to `ensure_installed`)
-  sync_install = false,
-
-  -- Automatically install missing parsers when entering buffer
-  -- Recommendation: set to false if you don't have `tree-sitter` CLI installed locally
-  auto_install = true,
-
-  highlight = {
-    enable = true,
-
-    -- Setting this to true will run `:h syntax` and tree-sitter at the same time.
-    -- Set this to `true` if you depend on 'syntax' being enabled (like for indentation).
-    -- Using this option may slow down your editor, and you may see some duplicate highlights.
-    -- Instead of true it can also be a list of languages
-    additional_vim_regex_highlighting = false,
-  },
+local parsers = {
+  "javascript",
+  "typescript",
+  "tsx",
+  "c_sharp",
+  "markdown",
+  "markdown_inline",
+  "c",
+  "lua",
+  "vim",
+  "vimdoc",
+  "query",
+  "regex",
+  "html",
 }
+
+treesitter.setup()
+treesitter.install(parsers)
+
+vim.treesitter.language.register('c_sharp', 'cs')
+
+vim.api.nvim_create_autocmd('FileType', {
+  pattern = {
+    'javascript',
+    'typescript',
+    'typescriptreact',
+    'cs',
+    'markdown',
+    'c',
+    'lua',
+    'vim',
+    'help',
+    'query',
+    'html',
+  },
+  callback = function()
+    vim.treesitter.start()
+  end,
+})

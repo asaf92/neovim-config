@@ -6,12 +6,13 @@ function M.setup()
 
   -- Auto-install missing Mason packages on startup.
   -- mason.nvim itself does not provide ensure_installed; do it via the registry.
+  -- Names are hard-coded constants; a typo should surface loudly, not be swallowed.
   local mason_ensure = { "basedpyright", "ruff", "gopls", "lua-language-server" }
   local mr = require("mason-registry")
   mr.refresh(function()
     for _, name in ipairs(mason_ensure) do
-      local ok, pkg = pcall(mr.get_package, name)
-      if ok and not pkg:is_installed() then
+      local pkg = mr.get_package(name)
+      if not pkg:is_installed() then
         pkg:install()
       end
     end

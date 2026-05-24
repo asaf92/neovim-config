@@ -6,7 +6,8 @@ end
 conform.setup({
   notify_on_error = true,
   formatters_by_ft = {
-    python = { "ruff_fix", "ruff_format" },
+    -- Python is handled by the ruff LSP directly (see lua/asaf/lsp.lua),
+    -- not by conform, so it uses the project-pinned ruff via `uv run`.
     javascript = { "prettierd", "prettier" },
     javascriptreact = { "prettierd", "prettier" },
     typescript = { "prettierd", "prettier" },

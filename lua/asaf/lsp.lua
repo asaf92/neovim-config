@@ -170,6 +170,70 @@ function M.setup()
       end
     end
 
+    -- Python: drive the ruff LSP directly. `source.fixAll.ruff` plus a
+    -- formatting request reproduces what `ruff check --fix && ruff format`
+    -- does, but uses the long-lived LSP (which we point at the project's
+    -- pinned ruff via `uv run`) instead of spawning a fresh CLI per save.
+    --
+    -- The two steps must run in order: autofix first (which can change line
+    -- counts via removed imports), then format. Each is issued as a sync
+    -- request so the next step sees the result.
+    if vim.bo[bufnr].filetype == "python" then
+      local ruff_client
+      for _, c in ipairs(vim.lsp.get_clients({ bufnr = bufnr, name = "ruff" })) do
+        ruff_client = c
+        break
+      end
+      if not ruff_client then
+        log("ruff LSP not attached; skipping Python format.", vim.log.levels.WARN)
+        return
+      end
+
+      local lsp_diags = vim.lsp.diagnostic.from(vim.diagnostic.get(bufnr))
+      local last_line = math.max(vim.api.nvim_buf_line_count(bufnr) - 1, 0)
+      local code_action_params = {
+        textDocument = vim.lsp.util.make_text_document_params(bufnr),
+        range = {
+          start = { line = 0, character = 0 },
+          ["end"] = { line = last_line, character = 0 },
+        },
+        context = {
+          diagnostics = lsp_diags,
+          only = { "source.fixAll.ruff" },
+        },
+      }
+      local response, err = ruff_client:request_sync("textDocument/codeAction", code_action_params, 2000, bufnr)
+      if err then
+        log(string.format("ruff codeAction failed: %s", err), vim.log.levels.ERROR)
+      elseif response and response.result then
+        for _, action in ipairs(response.result) do
+          -- ruff returns source.fixAll.ruff actions without an edit attached;
+          -- we have to resolve it to get the workspace edit.
+          if not action.edit and action.data then
+            local resolved = ruff_client:request_sync("codeAction/resolve", action, 2000, bufnr)
+            if resolved and resolved.result and resolved.result.edit then
+              action.edit = resolved.result.edit
+            end
+          end
+          if action.edit then
+            vim.lsp.util.apply_workspace_edit(action.edit, ruff_client.offset_encoding)
+          end
+        end
+      end
+
+      local ok, ferr = pcall(vim.lsp.buf.format, {
+        bufnr = bufnr,
+        async = false,
+        filter = function(client)
+          return client.name == "ruff"
+        end,
+      })
+      if not ok then
+        log(string.format("ruff format failed: %s", ferr), vim.log.levels.ERROR)
+      end
+      return
+    end
+
     local ok_conform, conform = pcall(require, "conform")
     if ok_conform then
       local ok_format, err = pcall(conform.format, {

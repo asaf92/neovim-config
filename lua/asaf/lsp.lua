@@ -4,6 +4,19 @@ function M.setup()
   -- Mason for managing external tools
   require("mason").setup()
 
+  -- Auto-install missing Mason packages on startup.
+  -- mason.nvim itself does not provide ensure_installed; do it via the registry.
+  local mason_ensure = { "basedpyright", "ruff", "gopls", "lua-language-server" }
+  local mr = require("mason-registry")
+  mr.refresh(function()
+    for _, name in ipairs(mason_ensure) do
+      local ok, pkg = pcall(mr.get_package, name)
+      if ok and not pkg:is_installed() then
+        pkg:install()
+      end
+    end
+  end)
+
   -- Diagnostics configuration
   vim.diagnostic.config({
     virtual_text = false,

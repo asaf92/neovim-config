@@ -15,7 +15,8 @@
 - `:LspInfo` — verifies LSP client status and settings.
 
 ## Coding Style & Naming Conventions
-- Lua is the primary language; keep indentation at 2 spaces.
+- Keep indentation at 2 spaces.
+- Do not wrap plugin `require(...)` calls in silent `pcall` guards for configured plugins. Fail loudly so broken installs/configs are visible. Use `pcall` only for truly optional dependencies, and report the failure with `vim.notify`.
 - Prefer small, focused modules under `lua/asaf/` and `lua/lsp/`.
 - Use descriptive, lowercase file names (e.g., `rust_analyzer.lua`).
 - Keymap descriptions should be short and consistent (see `lua/asaf/lsp.lua`).

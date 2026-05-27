@@ -102,4 +102,6 @@ return require('packer').startup(function(use)
       require("which-key").setup {}
     end
   }
+  use 'folke/snacks.nvim'
+  use 'nickjvandyke/opencode.nvim'
 end)

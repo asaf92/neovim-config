@@ -1,47 +1,54 @@
-vim.g.opencode_opts = {
-  events = {
-    reload = false,
+vim.o.autoread = true
+
+local snacks = require("snacks")
+snacks.setup({
+  input = {},
+  picker = {},
+  terminal = {},
+})
+
+local opencode_cmd = "opencode --port"
+local opencode_terminal_opts = {
+  auto_insert = true,
+  start_insert = true,
+  win = {
+    position = "right",
+    width = math.floor(vim.o.columns * 0.35),
+    on_win = function(win)
+      require("opencode.terminal").setup(win.win)
+    end,
   },
 }
 
-local snacks_ok, snacks = pcall(require, "snacks")
-if snacks_ok then
-  snacks.setup({
-    input = {},
-    picker = {},
-  })
-else
-  vim.notify("opencode: snacks.nvim not available", vim.log.levels.WARN)
+local function terminal_opts(enter, opts)
+  return vim.tbl_deep_extend("force", opencode_terminal_opts, {
+    win = {
+      enter = enter,
+    },
+  }, opts or {})
 end
+
+vim.g.opencode_opts = {
+  server = {
+    start = function()
+      require("snacks.terminal").open(opencode_cmd, terminal_opts(false))
+    end,
+    stop = function()
+      local terminal = require("snacks.terminal").get(opencode_cmd, terminal_opts(false, {
+        create = false,
+      }))
+      if terminal then
+        terminal:close()
+      end
+    end,
+    toggle = function()
+      require("snacks.terminal").focus(opencode_cmd, terminal_opts(true))
+    end,
+  },
+  events = {
+    reload = true,
+  },
+}
 
 local opencode = require("opencode")
 vim.keymap.set("n", "<leader>o", opencode.toggle, { desc = "Toggle opencode" })
-
-vim.api.nvim_create_autocmd("User", {
-  pattern = "OpencodeEvent:file.edited",
-  callback = function(args)
-    vim.schedule(function()
-      local event = args.data and args.data.event or nil
-      local file = event and event.properties and event.properties.file or nil
-      if not file then
-        return
-      end
-
-      local target = vim.fs.normalize(file)
-      for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-        local name = vim.api.nvim_buf_get_name(buf)
-        if vim.api.nvim_buf_is_loaded(buf) and name ~= "" and vim.fs.normalize(name) == target then
-          if vim.bo[buf].modified then
-            vim.notify("opencode edited file on disk, but buffer has unsaved changes: " .. target, vim.log.levels.WARN)
-            return
-          end
-
-          vim.api.nvim_buf_call(buf, function()
-            vim.cmd("edit!")
-          end)
-          return
-        end
-      end
-    end)
-  end,
-})

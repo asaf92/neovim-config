@@ -1,7 +1,5 @@
 vim.g.mapleader = " "
-vim.keymap.set("n", "<leader>pv", function()
-  require("telescope.builtin").find_files()
-end, { desc = "Find Files" })
+vim.keymap.set("n", "<leader>pv", vim.cmd.Ex, { desc = "File Explorer" })
 
 -- Center screen after scroll
 vim.keymap.set("n", "<C-d>", "<C-d>zz", { desc = "Scroll Down and Center" })

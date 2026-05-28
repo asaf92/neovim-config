@@ -51,4 +51,8 @@ vim.g.opencode_opts = {
 }
 
 local opencode = require("opencode")
-vim.keymap.set("n", "<leader>o", opencode.toggle, { desc = "Toggle opencode" })
+vim.keymap.set("n", "<leader>oo", opencode.toggle, { desc = "Toggle opencode" })
+vim.keymap.set({ "n", "x" }, "<leader>os", opencode.select, { desc = "Select opencode action" })
+vim.keymap.set("n", "<leader>od", function()
+  opencode.prompt("Explain @diagnostics")
+end, { desc = "Explain diagnostics" })

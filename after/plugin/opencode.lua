@@ -13,7 +13,9 @@ local opencode_terminal_opts = {
   start_insert = true,
   win = {
     position = "right",
-    width = math.floor(vim.o.columns * 0.35),
+    width = function()
+      return math.floor(vim.o.columns * 0.45)
+    end,
     on_win = function(win)
       require("opencode.terminal").setup(win.win)
     end,

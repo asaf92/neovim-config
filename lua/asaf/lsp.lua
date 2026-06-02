@@ -420,11 +420,51 @@ function M.setup()
   end
 
   -- LspRestart command
-  vim.api.nvim_create_user_command("LspRestart", function()
-    for _, client in pairs(vim.lsp.get_clients()) do
-      client.stop()
+  vim.api.nvim_create_user_command("LspRestart", function(info)
+    local names = info.fargs
+    if #names == 0 then
+      names = vim
+        .iter(vim.lsp.get_clients())
+        :map(function(client)
+          return client.name
+        end)
+        :totable()
     end
-  end, { desc = "Restart LSP clients" })
+
+    for _, name in ipairs(names) do
+      if vim.lsp.config[name] then
+        vim.lsp.enable(name, false)
+        if info.bang then
+          for _, client in ipairs(vim.lsp.get_clients({ name = name })) do
+            client:stop(true)
+          end
+        end
+      else
+        vim.notify(("Invalid server name '%s'"):format(name), vim.log.levels.WARN)
+      end
+    end
+
+    vim.defer_fn(function()
+      for _, name in ipairs(names) do
+        if vim.lsp.config[name] then
+          vim.lsp.enable(name, true)
+        end
+      end
+      vim.cmd.doautoall("nvim.lsp.enable FileType")
+    end, 500)
+  end, {
+    bang = true,
+    complete = function()
+      return vim
+        .iter(vim.lsp.get_clients())
+        :map(function(client)
+          return client.name
+        end)
+        :totable()
+    end,
+    desc = "Restart LSP clients",
+    nargs = "?",
+  })
 end
 
 return M

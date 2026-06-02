@@ -8,7 +8,7 @@ vim.keymap.set("n", "<C-u>", "<C-u>zz", { desc = "Scroll Up and Center" })
 vim.keymap.set("n", "<leader>Y", "ggVGy", {noremap = true, silent = true, desc = "Yank Entire Buffer" })
 
 -- LSP Restart
-vim.api.nvim_set_keymap('n', '<leader>lsr', ':LspRestart<CR>', { noremap = true })
+vim.keymap.set('n', '<leader>lsr', '<cmd>lsp restart<CR>', { desc = "LSP Restart" })
 vim.keymap.set('n', '<leader>lsw', function()
   require("asaf.rust_analyzer_target").set_windows()
 end, { desc = "rust-analyzer Windows target" })

@@ -11,6 +11,10 @@ local function settings(target)
     cargo.target = target
   end
 
+  if target == WINDOWS_TARGET then
+    cargo.cfgs = { 'target_os="windows"' }
+  end
+
   return {
     ["rust-analyzer"] = {
       cargo = cargo,
@@ -19,6 +23,19 @@ local function settings(target)
       },
     },
   }
+end
+
+local function start_rust_analyzer_for_open_rust_buffers()
+  for _, bufnr in ipairs(vim.api.nvim_list_bufs()) do
+    if vim.api.nvim_buf_is_loaded(bufnr) and vim.bo[bufnr].filetype == "rust" then
+      local file = vim.api.nvim_buf_get_name(bufnr)
+      local root = vim.fs.root(file, { "Cargo.toml", "rust-project.json", ".git" }) or vim.fn.getcwd()
+      local config = vim.deepcopy(vim.lsp.config.rust_analyzer)
+      config.root_dir = root
+
+      vim.lsp.start(config, { bufnr = bufnr })
+    end
+  end
 end
 
 function M.config()
@@ -40,18 +57,18 @@ function M.set_target(target, label)
 
   local existing = vim.lsp.config.rust_analyzer or {}
   local config = vim.tbl_deep_extend("force", existing, M.config())
-  vim.lsp.config("rust_analyzer", config)
 
-  if vim.fn.exists(":LspRestart") == 2 then
-    vim.cmd("LspRestart rust_analyzer")
-  else
-    for _, client in ipairs(vim.lsp.get_clients({ name = "rust_analyzer" })) do
-      client.stop(true)
-    end
-    vim.defer_fn(function()
-      vim.lsp.enable("rust_analyzer")
-    end, 100)
+  if not target then
+    config.settings["rust-analyzer"].cargo.target = nil
+    config.settings["rust-analyzer"].cargo.cfgs = nil
   end
+
+  vim.diagnostic.reset()
+
+  vim.lsp.enable("rust_analyzer", false)
+  vim.lsp.config.rust_analyzer = config
+  vim.lsp.enable("rust_analyzer", true)
+  start_rust_analyzer_for_open_rust_buffers()
 
   vim.notify("rust-analyzer target: " .. label)
 end

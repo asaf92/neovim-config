@@ -9,6 +9,12 @@ vim.keymap.set("n", "<leader>Y", "ggVGy", {noremap = true, silent = true, desc =
 
 -- LSP Restart
 vim.api.nvim_set_keymap('n', '<leader>lsr', ':LspRestart<CR>', { noremap = true })
+vim.keymap.set('n', '<leader>lsw', function()
+  require("asaf.rust_analyzer_target").set_windows()
+end, { desc = "rust-analyzer Windows target" })
+vim.keymap.set('n', '<leader>lsm', function()
+  require("asaf.rust_analyzer_target").set_mac()
+end, { desc = "rust-analyzer macOS/default target" })
 
 -- Pane switching
 local pane_opts = { silent = true }

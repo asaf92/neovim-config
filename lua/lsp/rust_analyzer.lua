@@ -1,12 +1,1 @@
-return {
-  settings = {
-    ["rust-analyzer"] = {
-      cargo = {
-        allFeatures = true,
-      },
-      check = {
-        command = "clippy",
-      },
-    },
-  },
-}
+return require("asaf.rust_analyzer_target").config()

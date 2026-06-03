@@ -3,9 +3,7 @@ local M = {}
 local WINDOWS_TARGET = "x86_64-pc-windows-msvc"
 
 local function settings(target)
-  local cargo = {
-    allFeatures = true,
-  }
+  local cargo = {}
 
   if target then
     cargo.target = target

@@ -30,6 +30,7 @@ vim.opt.smartcase = true
 -- Boundary
 vim.opt.wrap = false
 vim.opt.colorcolumn = "100"
+vim.opt.scrolloff = 4
 
 -- Clipboard
 vim.opt.clipboard:append("unnamedplus")

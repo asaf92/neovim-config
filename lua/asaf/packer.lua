@@ -61,7 +61,7 @@ return require('packer').startup(function(use)
         keymap_inst_continue = '',
         keymap_inst_accept = '',
         keymap_inst_cancel = '',
-        enable_at_startup = false,
+        enable_at_startup = true,
       }
     end,
   }

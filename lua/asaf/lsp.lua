@@ -338,6 +338,7 @@ function M.setup()
       end
 
       bufmap("n", "gd", vim.lsp.buf.definition, { desc = "Go to Definition" })
+      bufmap("n", "gD", vim.lsp.buf.declaration, { desc = "Go to Declaration" })
       bufmap("n", "K", function()
         vim.lsp.buf.hover({
           -- Otherwise there's no border and it's hard to distinguish

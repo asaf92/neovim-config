@@ -417,7 +417,7 @@ function M.setup()
     end
 
     for _, client in ipairs(clients) do
-      if client.is_stopped then
+      if client:is_stopped() then
         return "✗"
       end
     end

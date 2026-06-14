@@ -27,6 +27,10 @@ function M.setup()
     severity_sort = false,
   })
 
+  -- Show CodeLens commands for any LSP server that supports them.
+  -- In Rust this surfaces rust-analyzer's run/debug/test lenses.
+  vim.lsp.codelens.enable(true)
+
   local diagnostic_modes = {
     { virtual_lines = true,  virtual_text = false, label = "virtual_lines" },
     { virtual_lines = false, virtual_text = true,  label = "virtual_text" },
@@ -354,6 +358,9 @@ function M.setup()
       bufmap("n", "<leader>d", vim.diagnostic.open_float, { desc = "Show Diagnostic Float" })
       bufmap("n", "<leader>D", cycle_diagnostic_mode, { desc = "Cycle diagnostic display" })
       bufmap({ "n", "v" }, "<leader>ca", vim.lsp.buf.code_action, { desc = "Code Action" })
+      if client and client.supports_method and client:supports_method("textDocument/codeLens", bufnr) then
+        bufmap("n", "<leader>cl", vim.lsp.codelens.run, { desc = "Run Code Lens" })
+      end
       bufmap("n", "<leader>rn", vim.lsp.buf.rename, { desc = "Rename Symbol" })
       vim.keymap.set("i", "<C-h>", vim.lsp.buf.signature_help, { buffer = bufnr, desc = "Signature Help" })
 

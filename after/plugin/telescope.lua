@@ -60,7 +60,7 @@ require('telescope').setup{
       },
     },
     path_display = {
-      "smart",
+      "filename_first",
     },
   },
   pickers = {

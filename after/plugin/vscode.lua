@@ -36,7 +36,7 @@ require('vscode').setup({
     ['@lsp.typemod.parameter.mutable.rust'] = { underline = true },
     ['@lsp.typemod.selfKeyword.mutable.rust'] = { underline = true },
     -- Ownership is bold
-    ['@lsp.typemod.variable.consuming.rust'] = { bold = true, underdashed = true },
+    ['@lsp.typemod.variable.consuming.rust'] = { strikethrough = true },
     -- References have italic
     ['@lsp.typemod.variable.reference.rust'] = { italic = true },
     -- Type symbols

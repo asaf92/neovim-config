@@ -11,6 +11,7 @@
 ## Build, Test, and Development Commands
 - `nvim` — launches Neovim with this config.
 - `:PackerSync` — installs/updates plugins declared in `lua/asaf/packer.lua`.
+- Headless packer sync: `nvim --headless -u NONE -c "set runtimepath^=/home/aagami/.config/nvim" -c "lua require('asaf.packer')" -c "autocmd User PackerComplete quitall" -c "PackerSync"`.
 - `:TSUpdate` — updates Tree-sitter parsers (used by `nvim-treesitter`).
 - `:LspInfo` — verifies LSP client status and settings.
 
@@ -30,6 +31,7 @@
 - Use `/tmp/` for scratch work (more reliable permissions); delete it after tests.
 - Redirect XDG dirs to keep tests isolated (data/state/cache).
 - Use a minimal headless init that prepends the repo to `runtimepath` and stubs heavy plugins.
+- When testing packer headlessly, load `lua/asaf/packer.lua` first so `PackerSync` is defined; plain headless startup in this repo does not expose that command.
 - Example layout: `/tmp/nvim-config-test/rust-proj/` for a toy project, `/tmp/nvim-config-test/nvim-data/`, `/tmp/nvim-config-test/nvim-state/`, `/tmp/nvim-config-test/nvim-cache/` for isolated Neovim dirs.
 
 ## Commit & Pull Request Guidelines

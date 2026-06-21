@@ -45,9 +45,15 @@ return require('packer').startup(function(use)
   use 'rafamadriz/friendly-snippets'
   use 'stevearc/conform.nvim'
   use {
+    'dmmulroy/ts-error-translator.nvim',
+    config = function()
+      require('ts-error-translator').setup()
+    end,
+  }
+  use {
     'ggml-org/llama.vim',
     setup = function()
-      vim.g.llama_config = {
+      vim.g.llama_config = vim.tbl_deep_extend('force', vim.g.llama_config or {}, {
         auto_fim = false,
         endpoint_fim = 'http://127.0.0.1:8012/infill',
         keymap_fim_trigger = '<C-f>',
@@ -58,7 +64,7 @@ return require('packer').startup(function(use)
         keymap_inst_continue = '',
         keymap_inst_accept = '',
         keymap_inst_cancel = '',
-      }
+      })
     end,
   }
   use {
